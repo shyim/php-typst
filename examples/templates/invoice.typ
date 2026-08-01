@@ -3,6 +3,15 @@
 
 #let data = json(bytes(sys.inputs.at("invoice")))
 
+// Required for PDF/UA-1 (document title in the PDF catalog / XMP).
+#set document(
+  title: "Rechnung Nr. " + data.meta.invoiceNumber,
+  author: data.seller.name,
+  description: "Rechnung " + data.meta.invoiceNumber + " für " + data.buyer.company,
+  keywords: ("Rechnung", "Invoice", data.meta.invoiceNumber),
+  date: none,
+)
+
 #let money(n) = {
   let s = str(calc.round(n * 100) / 100)
   // ensure two decimal places
@@ -59,7 +68,8 @@
   },
 )
 
-#set text(font: "DejaVu Sans", size: 9.5pt)
+// Document language for PDF/UA (/Lang and XMP dc:language).
+#set text(font: "DejaVu Sans", size: 9.5pt, lang: "de")
 #set par(leading: 0.55em)
 
 // --- Logo / company mark ---

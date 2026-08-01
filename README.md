@@ -59,9 +59,23 @@ Shopware-style commercial invoice (letter header, line items, MwSt. summary, ban
 ```bash
 php examples/invoice.php
 # → examples/output/rechnung.pdf
+# → examples/output/rechnung-ua.pdf   (PDF/UA-1)
 ```
 
 Template: `examples/templates/invoice.typ` · data via `sys.inputs` JSON.
+
+PDF/UA-1 export:
+
+```php
+$document->toPdf(new Typst\PdfOptions(
+    identifier: 'invoice-10045',
+    version: Typst\PdfVersion::V1_7,
+    validator: Typst\PdfValidator::Ua1,
+    tagged: true, // required for PDF/UA
+));
+```
+
+The Typst source must set a document title (`#set document(title: …)`) — PDF/UA rejects missing titles.
 
 ## How the binary is resolved
 

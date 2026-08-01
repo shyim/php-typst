@@ -130,11 +130,26 @@ if (!is_dir($out)) {
     mkdir($out, 0777, true);
 }
 
+// PDF/UA-1 (ISO 14289-1): tagged structure tree for assistive tech.
+// See Typst\PdfValidator::Ua1 — requires tagged PDF (default true).
+$pdfUa = new Typst\PdfOptions(
+    identifier: 'invoice-' . $invoice['meta']['invoiceNumber'],
+    timestamp: (new DateTimeImmutable($invoice['meta']['invoiceDate'] . ' 12:00:00', new DateTimeZone('Europe/Berlin')))->getTimestamp(),
+    version: Typst\PdfVersion::V1_7,
+    validator: Typst\PdfValidator::Ua1,
+    tagged: true,
+);
+
 $pdfPath = $out . '/rechnung.pdf';
+$pdfUaPath = $out . '/rechnung-ua.pdf';
+
 $document->toPdf()->save($pdfPath);
+$document->toPdf($pdfUa)->save($pdfUaPath);
 $document->toImage(null, new Typst\ImageOptions(dpi: 144.0))->save($out . '/rechnung.png');
 
 echo "German invoice written to:\n";
-echo "  {$pdfPath}\n";
+echo "  {$pdfPath}     (default PDF 1.7, tagged)\n";
+echo "  {$pdfUaPath}  (PDF/UA-1)\n";
 echo "  {$out}/rechnung.png\n";
 echo 'Pages: ' . $document->pageCount() . PHP_EOL;
+echo 'PDF/UA size: ' . filesize($pdfUaPath) . " bytes\n";
