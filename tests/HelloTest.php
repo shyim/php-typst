@@ -9,6 +9,9 @@ use Typst\Compiler;
 use Typst\Native;
 use Typst\World;
 
+/**
+ * Minimal end-to-end smoke test.
+ */
 final class HelloTest extends TestCase
 {
     public function testNativeLibraryIsInstalled(): void
