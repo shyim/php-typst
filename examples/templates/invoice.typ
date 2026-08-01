@@ -72,9 +72,10 @@
 #v(0.8cm)
 
 // --- Letter header: recipient (left) + sender meta (right) ---
+// Mirrors Shopware letter_header: return address + billing left, company + order meta right.
 #grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1.2cm,
+  columns: (1.15fr, 0.85fr),
+  column-gutter: 1.5cm,
   [
     #text(size: 7pt, fill: rgb("#555"))[
       #data.seller.addressLine
@@ -95,24 +96,30 @@
       USt-IdNr.: #data.buyer.vatId
     ]
   ],
+  // Right column: flush right as a block, content left-aligned inside (Shopware sender-address-container)
   align(right)[
-    #table(
-      columns: (auto, auto),
-      inset: (x: 0pt, y: 2.5pt),
-      stroke: none,
-      align: (right, left),
-      [*#data.seller.name*], [],
-      [#data.seller.street], [],
-      [#data.seller.zip #data.seller.city], [],
-      [Tel.: #data.seller.phone], [],
-      [#data.seller.email], [],
-      [#data.seller.url], [],
-      [], [],
-      [Kundennummer:], [#data.meta.customerNumber],
-      [Bestellnummer:], [#data.meta.orderNumber],
-      [Bestelldatum:], [#data.meta.orderDate],
-      [Rechnungsdatum:], [#data.meta.invoiceDate],
-    )
+    #align(left)[
+      #text(weight: "bold")[#data.seller.name] \
+      #data.seller.street \
+      #data.seller.zip #data.seller.city \
+      Tel.: #data.seller.phone \
+      #data.seller.email \
+      #data.seller.url
+
+      #v(8pt)
+
+      #table(
+        columns: (auto, auto),
+        column-gutter: 10pt,
+        inset: (x: 0pt, y: 2.2pt),
+        stroke: none,
+        align: (left, left),
+        [Kundennummer:], [#data.meta.customerNumber],
+        [Bestellnummer:], [#data.meta.orderNumber],
+        [Bestelldatum:], [#data.meta.orderDate],
+        [Rechnungsdatum:], [#data.meta.invoiceDate],
+      )
+    ]
   ],
 )
 
