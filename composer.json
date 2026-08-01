@@ -1,0 +1,86 @@
+{
+  "name": "shyim/php-typst",
+  "description": "Typst typesetting engine for PHP via FFI (downloads prebuilt shyim/typst-ffi binaries)",
+  "type": "library",
+  "license": [
+    "MIT",
+    "Apache-2.0"
+  ],
+  "keywords": [
+    "typst",
+    "pdf",
+    "ffi",
+    "typesetting"
+  ],
+  "homepage": "https://github.com/shyim/php-typst",
+  "require": {
+    "php": ">=8.3",
+    "ext-ffi": "*",
+    "shyim/composer-binary-downloader": "^0.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Typst\\": "src/Typst/"
+    },
+    "files": [
+      "src/Typst/functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Typst\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "binaries": {
+      "typst": {
+        "version": "0.1.0",
+        "repository": "shyim/typst-ffi",
+        "asset": "typst-ffi-v{version}-{target}.{ext}",
+        "archive": "tar.xz",
+        "path": "bin/{target}/{library}",
+        "env-prefix": "TYPST",
+        "targets": {
+          "x86_64-apple-darwin": "libtypst_ffi.dylib",
+          "aarch64-apple-darwin": "libtypst_ffi.dylib",
+          "x86_64-unknown-linux-gnu": "libtypst_ffi.so",
+          "aarch64-unknown-linux-gnu": "libtypst_ffi.so",
+          "x86_64-unknown-linux-musl": "libtypst_ffi.so",
+          "aarch64-unknown-linux-musl": "libtypst_ffi.so",
+          "x86_64-pc-windows-msvc": {
+            "library": "typst_ffi.dll",
+            "archive": "zip"
+          },
+          "aarch64-pc-windows-msvc": {
+            "library": "typst_ffi.dll",
+            "archive": "zip"
+          }
+        },
+        "checksums": {
+          "aarch64-apple-darwin": "2f1207d9caff5bba2a3bbdbc7cbc281b18c742fb24e04d1b5298da758c181a3c",
+          "x86_64-apple-darwin": "f97c0f9dfcf3318224596bbbb5a85d4f80a9943e2ca4723e301a99561678a914",
+          "x86_64-unknown-linux-gnu": "f811b4584a7c693e081a89d7d91c35ed353b3c4398629766588c8dd64d8d64c8",
+          "aarch64-unknown-linux-gnu": "477c996d14a8418156ae6597f89c52cdfcf951f79a1181963ee926ac04451d7b",
+          "x86_64-unknown-linux-musl": "9dad4c00007f7505e8a45ae6dced936fecb417b97b37d12f8b5c1fdf7cf5a59e",
+          "aarch64-unknown-linux-musl": "c2d911b59c4634ac5f2e13841bcfa5b6efe5a7e17ca14867397152224632a2bc",
+          "x86_64-pc-windows-msvc": "9f64838253a0134aa840990ad04d41bcf1f69205341ec552a9da2bd5aef88d6c",
+          "aarch64-pc-windows-msvc": "b5e7e4802a907258b9871cefbd14e95f55f32128b9a220284407b06c06f8005e"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "post-install-cmd": "@php vendor/bin/binary-download",
+    "post-update-cmd": "@php vendor/bin/binary-download",
+    "test": "phpunit"
+  },
+  "config": {
+    "allow-plugins": {
+      "shyim/composer-binary-downloader": true
+    },
+    "sort-packages": true
+  }
+}

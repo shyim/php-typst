@@ -1,0 +1,147 @@
+/**
+ * Typst FFI C ABI — used by PHP FFI.
+ *
+ * Handles are opaque pointers owned by the caller unless noted otherwise.
+ * Free with the matching typst_*_free function.
+ */
+
+#ifndef TYPST_FFI_H
+#define TYPST_FFI_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct WorldHandle WorldHandle;
+typedef struct SourceHandle SourceHandle;
+typedef struct CompilerHandle CompilerHandle;
+typedef struct DocumentHandle DocumentHandle;
+typedef struct InspectorHandle InspectorHandle;
+typedef struct CompilationResultHandle CompilationResultHandle;
+typedef struct PendingHandle PendingHandle;
+
+typedef struct TypstBuffer {
+    uint8_t *data;
+    size_t len;
+} TypstBuffer;
+
+typedef struct TypstImageResult {
+    TypstBuffer data;
+    uint32_t width;
+    uint32_t height;
+    int32_t format; /* 0 = png, 1 = jpeg */
+} TypstImageResult;
+
+typedef struct TypstPdfResult {
+    TypstBuffer data;
+    size_t page_count;
+} TypstPdfResult;
+
+/* versions */
+const char *typst_version(void);
+const char *typst_engine_version(void);
+
+/* errors: kind 0=ok 1=invalid 2=runtime 3=logic 4=oob */
+const char *typst_last_error_message(void);
+int32_t typst_last_error_code(void);
+int32_t typst_last_error_kind(void);
+
+void typst_buffer_free(TypstBuffer buf);
+void typst_string_free(char *s);
+void typst_buffers_free(TypstBuffer *bufs, size_t count);
+
+/* world */
+WorldHandle *typst_world_new(
+    const char *template_dir,
+    int64_t cache_size,
+    int32_t embed_default_fonts,
+    const char *font_dirs_json,
+    const char *package_dir
+);
+void typst_world_free(WorldHandle *world);
+WorldHandle *typst_world_clone(const WorldHandle *world);
+int32_t typst_world_add_font_data(WorldHandle *world, const uint8_t *data, size_t len);
+int32_t typst_world_add_font_file(WorldHandle *world, const char *path);
+SourceHandle *typst_world_load_string(WorldHandle *world, const uint8_t *source, size_t len);
+SourceHandle *typst_world_load_file(WorldHandle *world, const char *path);
+TypstBuffer typst_world_get_font_families(const WorldHandle *world);
+TypstBuffer typst_world_debug_info(const WorldHandle *world);
+
+/* source */
+void typst_source_free(SourceHandle *source);
+int64_t typst_source_get_id(const SourceHandle *source);
+TypstBuffer typst_source_get_text(const SourceHandle *source);
+
+/* compiler */
+CompilerHandle *typst_compiler_new(const WorldHandle *world);
+void typst_compiler_free(CompilerHandle *compiler);
+DocumentHandle *typst_compiler_compile(CompilerHandle *compiler, const SourceHandle *source, const char *inputs_json);
+DocumentHandle *typst_compiler_compile_string(CompilerHandle *compiler, const uint8_t *source, size_t len, const char *inputs_json);
+DocumentHandle *typst_compiler_compile_file(CompilerHandle *compiler, const char *path, const char *inputs_json);
+int64_t typst_compiler_clear_cache(const CompilerHandle *compiler);
+WorldHandle *typst_compiler_get_world(const CompilerHandle *compiler);
+PendingHandle *typst_compiler_compile_in_background(const CompilerHandle *compiler, const SourceHandle *source, const char *inputs_json);
+TypstBuffer typst_compiler_debug_info(const CompilerHandle *compiler);
+
+/* document */
+void typst_document_free(DocumentHandle *doc);
+DocumentHandle *typst_document_clone(const DocumentHandle *doc);
+int64_t typst_document_page_count(const DocumentHandle *doc);
+double typst_document_page_width(const DocumentHandle *doc, int64_t page);
+double typst_document_page_height(const DocumentHandle *doc, int64_t page);
+TypstPdfResult typst_document_to_pdf(
+    const DocumentHandle *doc,
+    const char *identifier,
+    int64_t timestamp,
+    int64_t first_page,
+    int64_t last_page,
+    const char *version,
+    const char *validator,
+    int32_t tagged
+);
+TypstImageResult typst_document_to_image(
+    const DocumentHandle *doc,
+    int64_t page,
+    int32_t format,
+    int32_t quality,
+    double dpi
+);
+TypstImageResult typst_document_to_image_at(
+    const DocumentHandle *doc,
+    int64_t page,
+    int32_t format,
+    int32_t quality,
+    double dpi
+);
+TypstBuffer typst_document_to_svg(const DocumentHandle *doc, int64_t page);
+TypstBuffer *typst_document_to_svg_all(const DocumentHandle *doc, size_t *out_count);
+int64_t typst_document_to_images_count(const DocumentHandle *doc);
+
+/* inspector */
+InspectorHandle *typst_inspector_new(const WorldHandle *world);
+void typst_inspector_free(InspectorHandle *inspector);
+CompilationResultHandle *typst_inspector_inspect(InspectorHandle *inspector, const SourceHandle *source, const char *inputs_json);
+CompilationResultHandle *typst_inspector_inspect_string(InspectorHandle *inspector, const uint8_t *source, size_t len, const char *inputs_json);
+CompilationResultHandle *typst_inspector_inspect_file(InspectorHandle *inspector, const char *path, const char *inputs_json);
+int64_t typst_inspector_clear_cache(const InspectorHandle *inspector);
+WorldHandle *typst_inspector_get_world(const InspectorHandle *inspector);
+
+void typst_compilation_result_free(CompilationResultHandle *result);
+int32_t typst_compilation_result_success(const CompilationResultHandle *result);
+DocumentHandle *typst_compilation_result_take_document(CompilationResultHandle *result);
+TypstBuffer typst_compilation_result_diagnostics_json(const CompilationResultHandle *result);
+
+/* pending / background */
+void typst_pending_free(PendingHandle *pending);
+int32_t typst_pending_is_ready(const PendingHandle *pending);
+int32_t typst_pending_notification_fd(const PendingHandle *pending);
+DocumentHandle *typst_pending_join(PendingHandle *pending);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* TYPST_FFI_H */

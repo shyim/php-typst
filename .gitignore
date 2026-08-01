@@ -1,0 +1,10 @@
+/vendor/
+/bin/*/
+!/bin/.gitkeep
+composer.lock
+/.phpunit.cache/
+/examples/output/
+*.pdf
+*.png
+*.svg
+.DS_Store
