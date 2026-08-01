@@ -52,6 +52,17 @@ $document->toImage()->save('output.png');
 $document->toSvg()->save('output.svg');
 ```
 
+### German invoice example
+
+Shopware-style commercial invoice (letter header, line items, MwSt. summary, bank footer):
+
+```bash
+php examples/invoice.php
+# → examples/output/rechnung.pdf
+```
+
+Template: `examples/templates/invoice.typ` · data via `sys.inputs` JSON.
+
 ## How the binary is resolved
 
 Configured in `composer.json` → `extra.binaries.typst`:
