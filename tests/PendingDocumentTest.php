@@ -66,7 +66,7 @@ final class PendingDocumentTest extends TestCase
         $source = $this->world->loadString("#set page(height: auto)\nHello");
         $pending = $this->compiler->compileInBackground($source);
         $stream = $pending->getNotificationStream();
-        self::assertIsResource($stream);
+        self::assertTrue(is_resource($stream));
         $pending->join();
     }
 

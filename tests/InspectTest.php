@@ -109,7 +109,6 @@ final class InspectTest extends TestCase
         self::assertInstanceOf(Diagnostic::class, $diag);
         self::assertSame(Severity::Error, $diag->severity());
         self::assertNotEmpty($diag->message());
-        self::assertIsArray($diag->hints());
         self::assertInstanceOf(Stringable::class, $diag);
         self::assertStringContainsString('error:', (string) $diag);
     }
@@ -132,10 +131,7 @@ final class InspectTest extends TestCase
         if ($span !== null) {
             self::assertGreaterThan(0, $span->line());
             self::assertGreaterThan(0, $span->column());
-            self::assertIsString($span->file());
-            self::assertIsString($span->text());
-        } else {
-            self::assertTrue(true);
+            self::assertNotSame('', $span->file() . $span->text());
         }
     }
 

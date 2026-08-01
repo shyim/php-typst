@@ -29,7 +29,7 @@ final class World
         $ffi = Native::lib();
         $fontDirsJson = null;
         if ($font_dirs !== null) {
-            $fontDirsJson = json_encode(array_values($font_dirs), JSON_THROW_ON_ERROR);
+            $fontDirsJson = json_encode($font_dirs, JSON_THROW_ON_ERROR);
         }
 
         $ptr = $ffi->typst_world_new(
@@ -54,7 +54,7 @@ final class World
 
     public function __destruct()
     {
-        if (isset($this->handle) && !FFI::isNull($this->handle)) {
+        if (!FFI::isNull($this->handle)) {
             Native::lib()->typst_world_free($this->handle);
         }
     }

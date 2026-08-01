@@ -103,7 +103,9 @@ composer binary:list
 ```bash
 composer install
 composer binary:install typst
-vendor/bin/phpunit
+composer test       # PHPUnit
+composer phpstan    # PHPStan level 9
+composer analyse    # phpstan + test
 php examples/hello.php
 ```
 

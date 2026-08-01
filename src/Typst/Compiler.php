@@ -19,7 +19,7 @@ final class Compiler
 
     public function __destruct()
     {
-        if (isset($this->handle) && !FFI::isNull($this->handle)) {
+        if (!FFI::isNull($this->handle)) {
             Native::lib()->typst_compiler_free($this->handle);
         }
     }

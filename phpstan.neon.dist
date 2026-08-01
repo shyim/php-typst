@@ -1,0 +1,17 @@
+parameters:
+    # Max level: mixed is disallowed, generics fully checked.
+    level: 9
+    paths:
+        - src
+        - tests
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: true
+    ignoreErrors:
+        # FFI methods are registered dynamically via FFI::cdef().
+        -
+            identifier: method.notFound
+            message: '#Call to an undefined method FFI::#'
+        # Struct field access on opaque CData is not statically typed.
+        -
+            identifier: property.notFound
+            message: '#Access to an undefined property FFI\\CData::#'

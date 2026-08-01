@@ -137,12 +137,18 @@ final class Native
 
     public static function bufferToString(CData $buf): string
     {
-        $len = (int) $buf->len;
-        if ($len === 0 || $buf->data === null || FFI::isNull($buf->data)) {
+        /** @var int $rawLen */
+        $rawLen = $buf->len;
+        $len = max(0, $rawLen);
+        /** @var CData|null $data */
+        $data = $buf->data;
+        if ($len === 0 || $data === null || FFI::isNull($data)) {
+            self::lib()->typst_buffer_free($buf);
+
             return '';
         }
 
-        $bytes = FFI::string($buf->data, $len);
+        $bytes = FFI::string($data, $len);
         self::lib()->typst_buffer_free($buf);
 
         return $bytes;

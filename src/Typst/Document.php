@@ -145,13 +145,19 @@ final class Document
             Native::throwLastError();
         }
 
-        $n = (int) $count->cdata;
+        /** @var int $rawCount */
+        $rawCount = $count->cdata;
+        $n = max(0, $rawCount);
         $svgs = [];
         for ($i = 0; $i < $n; $i++) {
             $buf = $ptrs[$i];
-            $len = (int) $buf->len;
-            $bytes = $len > 0 && $buf->data !== null && !FFI::isNull($buf->data)
-                ? FFI::string($buf->data, $len)
+            /** @var int $rawLen */
+            $rawLen = $buf->len;
+            $len = max(0, $rawLen);
+            /** @var CData|null $data */
+            $data = $buf->data;
+            $bytes = $len > 0 && $data !== null && !FFI::isNull($data)
+                ? FFI::string($data, $len)
                 : '';
             $svgs[] = new Svg($bytes);
         }

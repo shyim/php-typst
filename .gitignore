@@ -3,6 +3,7 @@
 !/bin/.gitkeep
 composer.lock
 /.phpunit.cache/
+/.phpstan.cache/
 /examples/output/
 *.pdf
 *.png

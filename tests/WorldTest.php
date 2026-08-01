@@ -105,7 +105,6 @@ final class WorldTest extends TestCase
     public function testSourceIdIsNonNegativeInt(): void
     {
         $id = (new World())->loadString('Hello')->getId();
-        self::assertIsInt($id);
         self::assertGreaterThanOrEqual(0, $id);
     }
 
@@ -122,7 +121,9 @@ final class WorldTest extends TestCase
     {
         $families = (new World())->getFontFamilies();
         self::assertNotEmpty($families);
-        self::assertContainsOnlyString($families);
+        foreach ($families as $family) {
+            self::assertNotSame('', $family);
+        }
     }
 
     public function testAddFontFileValid(): void

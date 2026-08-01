@@ -48,11 +48,13 @@ final class NativeTest extends TestCase
             'n' => null,
         ]);
         self::assertNotNull($json);
+        /** @var array{s: string, i: int, f: float, b: bool, n: mixed} $decoded */
         $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('hello', $decoded['s']);
         self::assertSame(42, $decoded['i']);
         self::assertTrue($decoded['b']);
-        self::assertNull($decoded['n']);
+        self::assertArrayHasKey('n', $decoded);
+        self::assertSame(null, $decoded['n']);
     }
 
     public function testEncodeInputsRejectsObject(): void

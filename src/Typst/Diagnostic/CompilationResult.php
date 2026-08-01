@@ -44,7 +44,7 @@ final class CompilationResult
 
     public function __destruct()
     {
-        if (isset($this->handle) && !FFI::isNull($this->handle)) {
+        if (!FFI::isNull($this->handle)) {
             Native::lib()->typst_compilation_result_free($this->handle);
         }
     }
@@ -104,24 +104,26 @@ final class CompilationResult
      */
     private static function parseDiagnostics(string $json): array
     {
-        /** @var list<array{severity: int, message: string, span: ?array{file: string, line: int, column: int, text: string}, hints: list<string>}> $raw */
+        /** @var list<array{severity: int, message: string, span?: array{file: string, line: int, column: int, text: string}|null, hints?: list<string>}> $raw */
         $raw = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         $out = [];
         foreach ($raw as $item) {
             $span = null;
-            if (isset($item['span']) && is_array($item['span'])) {
+            $spanData = $item['span'] ?? null;
+            if (is_array($spanData)) {
                 $span = new SourceSpan(
-                    (string) $item['span']['file'],
-                    (int) $item['span']['line'],
-                    (int) $item['span']['column'],
-                    (string) $item['span']['text'],
+                    (string) $spanData['file'],
+                    (int) $spanData['line'],
+                    (int) $spanData['column'],
+                    (string) $spanData['text'],
                 );
             }
+            $hints = $item['hints'] ?? [];
             $out[] = new Diagnostic(
                 Severity::from((int) $item['severity']),
                 (string) $item['message'],
                 $span,
-                array_map('strval', $item['hints'] ?? []),
+                array_map('strval', $hints),
             );
         }
 
